@@ -1,7 +1,8 @@
 {
   "name": "mail-dayou-chat",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
+  "description": "阿空大邮 chat 前端 · React + Vite + @akong/ui-react · 多用户邮箱 IMAP/SMTP",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,14 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@akong/ui": "file:../akong-ui",
-    "vue": "^3.5.33",
-    "vue-router": "^4.5.0"
+    "@akong/ui-react": "file:../akong-ui-react",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.4",
-    "@vitejs/plugin-vue": "^6.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^5.0.0",
     "tailwindcss": "^4.2.4",
+    "typescript": "^5.7.2",
     "vite": "^8.0.10"
   }
 }

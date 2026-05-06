@@ -1,6 +1,5 @@
 @import "tailwindcss";
-@import "@akong/ui/styles/shadcn.css";
+@import "@akong/ui-react/styles/shadcn.css";
 
-/* 让 Tailwind 4 扫 @akong/ui 的 .vue files (默认不扫 node_modules) · 不然 components 里的 class purged */
-@source "../node_modules/@akong/ui/src/**/*.{vue,js}";
-@source "../node_modules/.pnpm/@akong+ui@file+*/node_modules/@akong/ui/src/**/*.{vue,js}";
+@source "../node_modules/@akong/ui-react/src/**/*.{ts,tsx}";
+@source "../node_modules/.pnpm/@akong+ui-react@file+*/node_modules/@akong/ui-react/src/**/*.{ts,tsx}";
