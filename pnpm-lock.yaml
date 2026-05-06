@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@akong/chat-shell':
+        specifier: file:../akong-chat-shell
+        version: file:../akong-chat-shell(@akong/ui-react@file:../akong-ui-react(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@akong/ui-react':
         specifier: file:../akong-ui-react
         version: file:../akong-ui-react(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -41,6 +44,13 @@ importers:
         version: 8.0.10(jiti@2.7.0)
 
 packages:
+
+  '@akong/chat-shell@file:../akong-chat-shell':
+    resolution: {directory: ../akong-chat-shell, type: directory}
+    peerDependencies:
+      '@akong/ui-react': '*'
+      react: ^19.0.0
+      react-dom: ^19.0.0
 
   '@akong/ui-react@file:../akong-ui-react':
     resolution: {directory: ../akong-ui-react, type: directory}
@@ -1491,6 +1501,12 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
 snapshots:
+
+  '@akong/chat-shell@file:../akong-chat-shell(@akong/ui-react@file:../akong-ui-react(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+    dependencies:
+      '@akong/ui-react': file:../akong-ui-react(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
 
   '@akong/ui-react@file:../akong-ui-react(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
