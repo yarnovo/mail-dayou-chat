@@ -1,0 +1,57 @@
+name: deploy
+# mail-dayou-chat · OSS 静态站部署 · push main → bucket agentaily-mail-dayou-chat
+#
+# vite build 时需要 sibling 仓 akong-ui-react + akong-chat-shell (package.json file:.. link)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "vite.config.ts"
+      - "tsconfig.json"
+      - "index.html"
+      - ".env.production"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone sibling libs (akong-ui-react + akong-chat-shell · file:link 解析)
+        run: |
+          cd ..
+          rm -rf akong-ui-react akong-chat-shell
+          git clone --depth 1 https://github.com/yarnovo/akong-ui-react.git
+          git clone --depth 1 https://github.com/yarnovo/akong-chat-shell.git
+          ls akong-ui-react akong-chat-shell
+
+      - uses: pnpm/action-setup@v4
+        with: { version: 10 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+
+      - name: pnpm install + vite build
+        run: |
+          pnpm install --no-frozen-lockfile
+          pnpm build
+          ls -lh dist/
+
+      - name: Upload to OSS (Menci/upload-to-oss · 增量 · 删孤儿)
+        uses: Menci/upload-to-oss@beta-v3
+        with:
+          access-key-id: ${{ secrets.OSS_ACCESS_KEY_ID }}
+          access-key-secret: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
+          endpoint: oss-cn-hangzhou.aliyuncs.com
+          bucket: agentaily-mail-dayou-chat
+          local-path: dist
+          remote-path: /
+          no-delete-remote-files: false
+
+      - name: Smoke
+        run: curl -kfL "https://chat.dayou.mail.agentaily.com/?cb=$RANDOM" -o /dev/null -w "HTTP %{http_code}\n" || true
