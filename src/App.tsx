@@ -32,7 +32,7 @@ export default function App() {
   const tmpIdRef = React.useRef(-1)
 
   // WELCOME 作为前端 sentinel · 永远第一条 (不存 backend · 用户每次进都看见 · 不被新消息挤掉)
-  const WELCOME_MSG: Message = { id: 0, role: "agent", content: WELCOME }
+  const WELCOME_MSG: Message = { id: 0, role: "agent", content: WELCOME, timestamp: new Date().toTimeString().slice(0, 5) }
 
   // 启动: 拉历史 + WELCOME prepend
   React.useEffect(() => {
