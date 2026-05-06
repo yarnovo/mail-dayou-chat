@@ -31,23 +31,22 @@ export default function App() {
   const [menuOpen, setMenuOpen] = React.useState(false)
   const tmpIdRef = React.useRef(-1)
 
-  // 启动: 拉历史 (替 localStorage)
+  // WELCOME 作为前端 sentinel · 永远第一条 (不存 backend · 用户每次进都看见 · 不被新消息挤掉)
+  const WELCOME_MSG: Message = { id: 0, role: "agent", content: WELCOME }
+
+  // 启动: 拉历史 + WELCOME prepend
   React.useEffect(() => {
     if (!BACKEND_READY) {
-      setMessages([{ id: 0, role: "agent", content: WELCOME }])
+      setMessages([WELCOME_MSG])
       return
     }
     loadHistory()
       .then((hist) => {
-        if (hist.length === 0) {
-          setMessages([{ id: 0, role: "agent", content: WELCOME }])
-        } else {
-          setMessages(hist.map(backendToFront))
-        }
+        setMessages([WELCOME_MSG, ...hist.map(backendToFront)])
       })
       .catch((e) => {
         setError(e instanceof Error ? e.message : String(e))
-        setMessages([{ id: 0, role: "agent", content: WELCOME }])
+        setMessages([WELCOME_MSG])
       })
   }, [])
 
@@ -65,7 +64,7 @@ export default function App() {
       await chat(text)
       // 重新拉历史 (拿真实 id + agent reply)
       const hist = await loadHistory()
-      setMessages(hist.map(backendToFront))
+      setMessages([WELCOME_MSG, ...hist.map(backendToFront)])
     } catch (e) {
       const m = e instanceof Error ? e.message : String(e)
       setError(m)
@@ -84,7 +83,7 @@ export default function App() {
     try {
       await markTopicBreak()
       const hist = await loadHistory()
-      setMessages(hist.map(backendToFront))
+      setMessages([WELCOME_MSG, ...hist.map(backendToFront)])
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
     }
