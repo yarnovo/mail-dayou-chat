@@ -15,14 +15,42 @@ export default function App() {
   const nextId = () => idRef.current++
   const now = () => new Date().toTimeString().slice(0, 5)
 
-  const [messages, setMessages] = React.useState<Message[]>([
-    { id: 0, role: "agent", content: WELCOME },
-  ])
+  // localStorage 持久化 · 跨刷新保留 (per uid)
+  const STORAGE_KEY = `dayou.chat.${userId()}`
+
+  function loadStored(): { messages: Message[]; history: ChatMsg[] } {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY)
+      if (raw) {
+        const d = JSON.parse(raw) as { messages: Message[]; history: ChatMsg[]; nextId: number }
+        idRef.current = d.nextId || 1
+        return { messages: d.messages, history: d.history }
+      }
+    } catch {}
+    return {
+      messages: [{ id: 0, role: "agent", content: WELCOME }],
+      history: [],
+    }
+  }
+  const stored = loadStored()
+
+  const [messages, setMessages] = React.useState<Message[]>(stored.messages)
   const [sending, setSending] = React.useState(false)
   const [error, setError] = React.useState("")
 
   // 跟 backend 保持的对话历史 (跟 OpenAI / qwen 同 schema)
-  const historyRef = React.useRef<ChatMsg[]>([])
+  const historyRef = React.useRef<ChatMsg[]>(stored.history)
+
+  // 每次 messages 变 · 写 localStorage
+  React.useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        messages,
+        history: historyRef.current,
+        nextId: idRef.current,
+      }))
+    } catch {}
+  }, [messages])
 
   async function onSend(text: string) {
     setError("")
