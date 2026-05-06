@@ -1,32 +1,47 @@
-// dayou-agent 后端调用 · POST /api/avatars/generate
+// dayou-agent 后端 · multi-user
+// 每 request 自动带 X-User-ID (localStorage 存匿名 anon-uuid · v0.2 接 SSO)
 
 const API_BASE = import.meta.env.VITE_API_BASE || ''
-const BACKEND_READY = !!API_BASE
 
-// 5 风格预设 · 跟 dayou-agent STYLE_PROMPTS 一致 (subagent 5-6 调研)
-export const STYLES = [
-  { slug: 'doubao',     name: '豆包风',   desc: '圆润 3D mascot · 黏土 · 蓝白调' },
-  { slug: 'flat',       name: '扁平',     desc: '几何 · 纯色 · dribbble 风' },
-  { slug: 'claymation', name: '黏土',     desc: 'Aardman 风 · 手作橡皮泥' },
-  { slug: 'anime',      name: '二次元',   desc: '日漫 · 大眼 · cel-shading' },
-  { slug: 'realistic',  name: '写实',     desc: '85mm 人像 · 切 plus 模型 (慢)' },
-]
-export const DEFAULT_STYLE = 'doubao'
+export const BACKEND_READY = !!API_BASE
 
-export async function generateAvatars({ prompt, style = DEFAULT_STYLE, n = 4, size = '1024*1024' }) {
+function getOrCreateUserId() {
+  let id = localStorage.getItem('dayou.user_id')
+  if (!id) {
+    id = 'anon-' + crypto.randomUUID().replace(/-/g, '')
+    localStorage.setItem('dayou.user_id', id)
+  }
+  return id
+}
+
+async function api(path, { method = 'GET', body = null } = {}) {
   if (!BACKEND_READY) {
     throw Object.assign(new Error('agent 后端建设中 · 当前是 v0.1 UI 预览版'), { kind: 'backend_not_ready' })
   }
-  const res = await fetch(`${API_BASE}/api/avatars/generate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt, style, n, size }),
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-User-ID': getOrCreateUserId(),
+    },
+    body: body ? JSON.stringify(body) : null,
   })
   if (!res.ok) {
     const detail = await res.json().catch(() => ({}))
     throw new Error(detail.detail || `HTTP ${res.status}`)
   }
-  return res.json()  // { urls, model, style, n }
+  return res.json()
 }
 
-export { BACKEND_READY }
+export const userId = () => getOrCreateUserId()
+
+export const guessProvider = (email) => api(`/api/providers/guess?email=${encodeURIComponent(email)}`)
+export const listProviders = () => api('/api/providers/list')
+export const connectMailbox = (req) => api('/api/mailbox/connect', { method: 'POST', body: req })
+export const listAccounts = () => api('/api/mailbox/accounts')
+export const deleteAccount = (slug) => api(`/api/mailbox/account?slug=${encodeURIComponent(slug)}`, { method: 'DELETE' })
+export const listInbox = (req) => api('/api/mailbox/list', { method: 'POST', body: req })
+export const readMail = (req) => api('/api/mailbox/read', { method: 'POST', body: req })
+export const draftMail = (req) => api('/api/mailbox/draft', { method: 'POST', body: req })
+export const sendDraft = (draftId) => api('/api/mailbox/send', { method: 'POST', body: { draft_id: draftId, user_confirmed: true } })
+export const archiveMail = (req) => api('/api/mailbox/archive', { method: 'POST', body: req })
