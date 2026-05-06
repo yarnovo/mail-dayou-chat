@@ -1,12 +1,6 @@
 @import "tailwindcss";
+@import "@akong/ui/styles/shadcn.css";
 
-@theme {
-  --color-akong-ink:    #1a1a1a;
-  --color-akong-paper:  #fafafa;
-  --color-akong-muted:  #6b6b6b;
-  --color-akong-border: #e5e7eb;
-  --color-akong-accent: #14b8a6;
-
-  --color-akong-bubble-user:  #14b8a6;
-  --color-akong-bubble-agent: #f3f4f6;
-}
+/* 让 Tailwind 4 扫 @akong/ui 的 .vue files (默认不扫 node_modules) · 不然 components 里的 class purged */
+@source "../node_modules/@akong/ui/src/**/*.{vue,js}";
+@source "../node_modules/.pnpm/@akong+ui@file+*/node_modules/@akong/ui/src/**/*.{vue,js}";
